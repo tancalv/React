@@ -24,26 +24,35 @@ class Board extends React.Component {
       onClick={()=> this.props.onClick(i)}
       />;
     }
+
+    renderThreeSquares(i){
+      const row = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8]
+      ];
+      let squares = [];
+      let squarePos = row[i];
+      for (let j = 0; j < 3; j++){
+        squares.push(this.renderSquare(squarePos[j]));
+      }
+      return squares;
+       
+  
+    }
     render(){
-      return (
-        <div>
-           <div className="board-row">
-            {this.renderSquare(0)}
-            {this.renderSquare(1)}
-            {this.renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(3)}
-            {this.renderSquare(4)}
-            {this.renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {this.renderSquare(6)}
-            {this.renderSquare(7)}
-            {this.renderSquare(8)}
-          </div>
+      let rows = [0, 1, 2];
+      let board = rows.map((rowNum) => {
+        return (
+        <div className="board-row" key={rowNum}>
+            {this.renderThreeSquares(rowNum)}
         </div>
-      );
+        )
+        });
+      return (
+        <div>{board}</div>
+        
+      )
     }
     }
    
@@ -120,10 +129,10 @@ class Board extends React.Component {
       return (
         <div className="game">
           <div className="game-board">
-            <Board 
-            squares={current.squares}
-            onClick={(i)=> this.handleClick(i)}
-            />
+              <Board 
+              squares={current.squares}
+              onClick={(i)=> this.handleClick(i)}
+              />
           </div>
           <div className="game-info">
             <div>{status}</div>
