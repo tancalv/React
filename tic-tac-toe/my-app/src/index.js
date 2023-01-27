@@ -67,7 +67,7 @@ class Board extends React.Component {
         const location = this.state.locationHistory.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
-        console.log(i);
+  
         if (calculateWinner(squares) || squares[i]){
             return;
         }
@@ -96,13 +96,14 @@ class Board extends React.Component {
     }
 
     render() {
+        const stepNumber = this.state.stepNumber;
         const history = this.state.history;
         const current = history[this.state.stepNumber];
         const location = this.state.locationHistory;
         const winner = calculateWinner(current.squares);
         const moves = history.map((step, move) => {
-          const desc = move ? `Go to move #${move}` : "Go to game start";
-          
+          let desc = move ? `Go to move #${move}` : "Go to game start";
+          desc = stepNumber === move ? <b>{desc}</b> : desc;
           return (
             <li key={move}>
               <button onClick={() => this.jumpTo(move)}>
