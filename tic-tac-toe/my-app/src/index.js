@@ -55,14 +55,19 @@ class Board extends React.Component {
             history: [
                 {squares: Array(9).fill(null)}
             ],
+            locationHistory: [
+              {location: null}
+            ],
             xIsNext: true,
             stepNumber: 0
         }
     }
     handleClick(i){
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
+        const location = this.state.locationHistory.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const squares = current.squares.slice();
+        console.log(i);
         if (calculateWinner(squares) || squares[i]){
             return;
         }
@@ -70,6 +75,7 @@ class Board extends React.Component {
        
         this.setState({
             history: history.concat([{squares: squares}]),
+            locationHistory: location.concat([{location: i}]),
              xIsNext: !this.state.xIsNext,
             stepNumber: history.length
             
@@ -79,6 +85,11 @@ class Board extends React.Component {
 
     jumpTo(step){
       this.setState({
+        // Added to update history if game restarted.
+        history: step === 0 ?  
+          [{squares: Array(9).fill(null)} ]: this.state.history,
+        locationHistory: step === 0 ?
+          [{location: null}] : this.state.locationHistory,
         stepNumber: step,
         xIsNext: (step % 2) === 0
       })
@@ -87,17 +98,22 @@ class Board extends React.Component {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
+        const location = this.state.locationHistory;
         const winner = calculateWinner(current.squares);
         const moves = history.map((step, move) => {
           const desc = move ? `Go to move #${move}` : "Go to game start";
+          
           return (
             <li key={move}>
               <button onClick={() => this.jumpTo(move)}>
                 {desc}
               </button>
+              <p>location: {location[move].location}</p>
             </li>
           )
         });
+      
+       
 
         let status = winner ? `Winner: ${winner}` : `Next player: ${this.state.xIsNext ? 'X' : 'O'}`;
       return (
