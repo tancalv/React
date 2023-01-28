@@ -68,7 +68,8 @@ class Board extends React.Component {
               {location: null}
             ],
             xIsNext: true,
-            stepNumber: 0
+            stepNumber: 0,
+            order: 'DESC'
         }
     }
     handleClick(i){
@@ -93,6 +94,7 @@ class Board extends React.Component {
     }
 
     jumpTo(step){
+     
       this.setState({
         // Added to update history if game restarted.
         history: step === 0 ?  
@@ -101,17 +103,20 @@ class Board extends React.Component {
           [{location: null}] : this.state.locationHistory,
         stepNumber: step,
         xIsNext: (step % 2) === 0
-      })
+      });
+     
     }
-
-    render() {
-        const stepNumber = this.state.stepNumber;
-        const history = this.state.history;
-        const current = history[this.state.stepNumber];
-        const location = this.state.locationHistory;
-        const winner = calculateWinner(current.squares);
-        const moves = history.map((step, move) => {
-          let desc = move ? `Go to move #${move}` : "Go to game start";
+ 
+    toggleOrder(){
+      this.setState({
+        order: this.state.order === "DESC" ? "ASC" : "DESC"
+      });
+    }
+    calculateMoves(order, history, location, stepNumber){
+      if (order === "DESC"){
+        return history.map((step, move) => {
+  
+          let desc = move  ? `Go to move #${move}` :"Go to game start";
           desc = stepNumber === move ? <b>{desc}</b> : desc;
           return (
             <li key={move}>
@@ -121,8 +126,34 @@ class Board extends React.Component {
               <p>location: {location[move].location}</p>
             </li>
           )
+        })
+    } else {
+        return history.map((step, move) => {
+          let asc = move === history.length - 1 ? 
+          "Go to game start" : `Go to move #${history.length - move - 1 }`;
+          asc = stepNumber === history.length - move - 1 ? <b>{asc}</b> : asc;
+          return (
+            <li key={move}>
+              <button onClick={() => this.jumpTo(history.length - move - 1)}>
+                {asc}
+              </button>
+              <p>location: {location[history.length - move - 1].location}</p>
+            </li>
+          )
         });
-      
+    }
+  
+  
+    }
+    render() {
+        const stepNumber = this.state.stepNumber;
+        const history = this.state.history;       
+        const current = history[this.state.stepNumber];
+        const location = this.state.locationHistory;
+        const winner = calculateWinner(current.squares);
+        const order = this.state.order;
+        const moves = this.calculateMoves(order, history, location, stepNumber);
+
        
 
         let status = winner ? `Winner: ${winner}` : `Next player: ${this.state.xIsNext ? 'X' : 'O'}`;
@@ -136,12 +167,14 @@ class Board extends React.Component {
           </div>
           <div className="game-info">
             <div>{status}</div>
-            <ol>{moves}</ol>
+            <ol reversed={order === "ASC" ? true: false}>{moves}</ol>
           </div>
+          <button className="toggle" onClick={() => this.toggleOrder()}>toggle ASC/DESC</button>
         </div>
       );
     }
   }
+  
 
   function calculateWinner(squares) {
     const lines = [
